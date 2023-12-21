@@ -21,6 +21,9 @@
 
     <!-- Original Script -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    {{-- css  --}}
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 <body>
     <div id="app">

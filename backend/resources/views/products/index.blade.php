@@ -74,7 +74,7 @@
     <table class="table table-hover align-middle table-sm mt-4">
         <thead class="table-secondary">
             <tr>
-                <th>ID</th>
+                <th>PHOTO</th>
                 <th>PRODUCT NAME</th>
                 <th>STOCK</th>
                 <th>PRICE</th>
@@ -85,8 +85,14 @@
         <tbody>
             @forelse ($all_products as $product)
                 <tr>
-                    <td>{{ $product->id }}</td>
-                    <td id="p_name">{{ $product->name }}</td>
+                    <td>
+                        @if ($product->image)
+                            <img src="{{ asset('storage/images/'. $product->image) }}" alt="{{ $product->image }}" style="width: 50px; height: 50px;">
+                        @else
+                            No Image
+                        @endif
+                    </td>
+                    <td>{{ $product->name }}</td>
                     <td>{{ $product->stock }}</td>
                     <td>{{ $product->price }}</td>
                     <td>
@@ -198,5 +204,5 @@
                 });
             });
         </script>
-    @endisset
+    @endisset    
 @endsection
