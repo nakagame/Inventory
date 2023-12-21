@@ -5,7 +5,7 @@
 @section('content')
     <h1>Welcome {{ $user->name }}</h1>
 
-    <form action="{{ route('profile.update', $user->id) }}" method="post">
+    <form action="{{ route('profile.update', $user->id) }}" method="post" enctype="multipart/form-data">
         @csrf
         @method('PATCH')
 
@@ -42,6 +42,24 @@
                 </div>
             </div>
         @endif
+
+        <div class="mb-3">
+            <div class="row">
+                <div class="col">
+                    <input type="file" name="image" id="image" class="form-control">
+                    @error('image')
+                        <div class="text-danger small">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col">
+                    @if ($user->image)
+                        <img src="{{ asset('storage/profiles/'. $user->image) }}" alt="{{ $user->image }}" class="img-thumbnail">
+                    @else
+                        <img src="https://thumb.ac-illust.com/73/7387030e5a5600726e5309496353969a_t.jpeg" alt="No Image" class="img-thumbnail">
+                    @endif
+                </div>
+            </div>
+        </div>
 
         <a href="{{ route('index') }}" class="btn btn-secondary">Cancel</a>
         <button type="submit" class="btn btn-success">
