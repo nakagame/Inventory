@@ -1,18 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Admin')
+@section('title', 'Search User')
     
 @section('content')
-    {{-- search  --}}
-    <form action="{{ route('admin.searchUser') }}" class="d-flex mb-3">
-        <input type="search" class="form-control" placeholder="Find user here" name="search" value="{{ old('') }}">
-        <button type="submit" class="btn btn-success ms-2">
-            Search
-        </button>
-    </form>
-    {{-- search End --}}
-    <h1>Hello Admin User</h1>
+    <h1 class="display-6">Result</h1>
 
+    @if ($users)
     <table class="table table-hover">
         <thead class="table-secondary">
             <tr>
@@ -25,7 +18,7 @@
             </tr>
         </thead>
         <tbody>
-            @forelse ($all_users as $user)
+            @forelse ($users as $user)
                 <tr>
                     <td>{{ $user->id }}</td>
                     <td>{{ $user->name }}</td>
@@ -151,9 +144,10 @@
     </table>
 
     <div class="row justify-content-center">
-        <div class="col-6">
-            {{ $all_users->links() }}
+        <div class="col-5">
+            {{ $users->appends(['search' => request('search')])->links() }}
+            {{-- {{ $users->links() }} --}}
         </div>
     </div>
-
+    @endif
 @endsection

@@ -42,10 +42,10 @@ Route::group(['middleware' => 'auth'], function() {
     // admin
     Route::group(['prefix' => 'admin', 'as' => 'admin.'], function() {
         Route::get('/', [AdminController::class, 'index'])->name('index');
+        Route::get('/search', [AdminController::class, 'searchUser'])->name('searchUser');
         Route::patch('/{id}/update', [AdminController::class, 'update'])->name('update');
         Route::delete('/{id}/destroy', [AdminController::class, 'destroy'])->name('destroy');
         Route::delete('/{id}/active/force-delete', [AdminController::class, 'forceDeleteActive'])->name('forceDeleteActive');
         Route::delete('/{id}/inactive/force-delete', [AdminController::class, 'forceDeleteInactive'])->name('forceDeleteInactive');
     });
-
 });

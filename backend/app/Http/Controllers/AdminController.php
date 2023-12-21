@@ -17,8 +17,8 @@ class AdminController extends Controller
     }
 
     public function index() {
-        // $all_users = User::paginate(15);
         $all_users = $this->user->withTrashed()->paginate(15);
+
         return view('admin.index')->with('all_users', $all_users);
     }
 
@@ -43,4 +43,13 @@ class AdminController extends Controller
         return redirect()->back();
     }
 
+    public function searchUser() {
+        if (request('search')) {
+            $users = $this->user->withTrashed()->where('name', 'like', '%' . request('search') . '%')->paginate(10);
+        } else {
+            $users = $this->user->paginate(10);
+        }
+    
+        return view('admin.search')->with('users', $users);
+    }
 }
