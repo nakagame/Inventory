@@ -17,6 +17,7 @@
         <thead class="table-secondary">
             <tr>
                 <th>ID</th>
+                <th>UserPhoto</th>
                 <th>Name</th>
                 <th>Role</th>
                 <th>Status</th>
@@ -28,6 +29,13 @@
             @forelse ($all_users as $user)
                 <tr>
                     <td>{{ $user->id }}</td>
+                    <td>
+                        @if ($user->image)
+                            <img src="{{ asset('storage/profiles/'. $user->image) }}" alt="{{ $user->image }}" class="rounded circle" style="width: 50px;height: 50px;object-fit:cover;">
+                        @else
+                            No Image...
+                        @endif
+                    </td>
                     <td>{{ $user->name }}</td>
                     <td>
                         @if ($user->role === 1)
@@ -151,7 +159,7 @@
     </table>
 
     <div class="row justify-content-center">
-        <div class="col-6">
+        <div class="col-7">
             {{ $all_users->links() }}
         </div>
     </div>
