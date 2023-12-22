@@ -99,13 +99,6 @@ class ProductController extends Controller
             'qty' => 'required|min:1' 
         ]);
 
-        // Check Payment
-        $payment_check = $this->paymentCheck($request, $product->price);
-
-        if($payment_check) {
-            return redirect()->back()->withErrors(['payment' => 'Insufficient payment.']);
-        }
-
         $new_stock = $product->stock - $request->qty;
 
         // Stock is gone -> delete the item
@@ -117,16 +110,5 @@ class ProductController extends Controller
         }
 
         return redirect()->back();
-    }
-
-    private function paymentCheck($request, $price) {
-        $payment = $request->total;
-        $total   = $request->qty * $price;
-
-        if($payment >= $total) {
-            return false;
-        }
-
-        return true;
     }
 }
