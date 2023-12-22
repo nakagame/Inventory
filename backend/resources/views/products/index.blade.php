@@ -130,7 +130,9 @@
 
                                         <div class="row mt-3">
                                             <div class="col-3">
-                                                <p class="fst-italic fq-bold mb-0">Price: ${{ $product->price }}</p>
+                                                <p class="fst-italic fq-bold mb-0">
+                                                    Price: ${{ $product->price }}
+                                                </p>
                                             </div>
 
                                         </div>
@@ -182,9 +184,8 @@
     @isset($product)
         <script>
             $(document).ready(function () {
-                function calculateTotal(productId) {
+                function calculateTotal(productId, pricePerUnit) {
                     var qty = $('#qty_' + productId).val();
-                    var pricePerUnit = parseFloat('{{ $product->price }}');
 
                     // Perform the calculation
                     var total = qty * pricePerUnit;
@@ -205,13 +206,13 @@
 
                 // Call the function on page load for each product modal
                 @foreach($all_products as $product)
-                    calculateTotal({{ $product->id }});
+                    calculateTotal({{ $product->id }}, {{ $product->price }});
                 @endforeach
 
                 // Bind the function to the 'input' event of the quantity and total fields for each product modal
                 @foreach($all_products as $product)
                     $('#qty_{{ $product->id }}, #total_{{ $product->id }}').on('input', function () {
-                        calculateTotal({{ $product->id }});
+                        calculateTotal({{ $product->id }}, {{ $product->price }});
                     });
                 @endforeach
             });

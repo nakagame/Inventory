@@ -11,8 +11,27 @@
         </button>
     </form>
     {{-- search End --}}
-    <h1>Hello Admin User</h1>
-
+    <div class="row">
+        <div class="col">
+            <h1>Hello Admin User</h1>
+        </div>
+        {{-- dropdown - Role  --}}
+        <div class="col text-end">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Role
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{{ route('admin.index') }}">All</a></li>    
+                    <li><a class="dropdown-item" href="{{ route('admin.index', ['role' => 3]) }}">Admin</a></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.index', ['role' => 2]) }}">Staff</a></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.index', ['role' => 1]) }}">User</a></li>
+                </ul>
+              </div>
+        </div>
+        {{-- dropdown - Status End --}}
+    </div>
+    
     <table class="table table-hover">
         <thead class="table-secondary">
             <tr>
@@ -31,7 +50,7 @@
                     <td>{{ $user->id }}</td>
                     <td>
                         @if ($user->image)
-                            <img src="{{ asset('storage/profiles/'. $user->image) }}" alt="{{ $user->image }}" class="rounded circle" style="width: 50px;height: 50px;object-fit:cover;">
+                            <img src="{{ asset('storage/profiles/'. $user->image) }}" alt="{{ $user->image }}" class="rounded circle" style="width: 50px;height: 50px;object-fit:contain;">
                         @else
                             No Image...
                         @endif

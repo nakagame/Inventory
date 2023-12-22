@@ -44,7 +44,12 @@ class UserController extends Controller
 
         $user->save();
 
-        return redirect()->route('index');
+        if(Auth::user()->role === 3) {
+            // admin
+            return redirect()->route('admin.index');
+        } else {
+            return redirect()->route('index');
+        }
     }
 
     private function saveImage($request) {
