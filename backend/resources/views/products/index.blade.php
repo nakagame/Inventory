@@ -3,12 +3,6 @@
 @section('title', 'Product')
     
 @section('content')
-    @if($errors->has('payment'))
-        <div class="alert alert-danger">
-            {{ $errors->first('payment') }}
-        </div>
-    @endif
-    
     @if (Auth::user()->role !== 1)
         <div class="card">
             <div class="card-header">
@@ -87,14 +81,14 @@
                 <tr>
                     <td>
                         @if ($product->image)
-                            <img src="{{ asset('storage/images/'. $product->image) }}" alt="{{ $product->image }}" style="width: 50px; height: 50px;">
+                            <img src="{{ asset('storage/images/'. $product->image) }}" alt="{{ $product->image }}" style="width: 50px; height: 50px; object-fit:contain;">
                         @else
                             No Image
                         @endif
                     </td>
                     <td>{{ $product->name }}</td>
                     <td>{{ $product->stock }}</td>
-                    <td>{{ $product->price }}</td>
+                    <td>$ {{ $product->price }}</td>
                     <td>
                         <div class="d-flex">
                             @if (Auth::user()->role != 1)
@@ -135,11 +129,16 @@
                                         </div>
 
                                         <div class="row mt-3">
-                                            <div class="col">
-                                                <p class="fst-italic fq-bold text-primary">Price: ${{ $product->price }}</p>
+                                            <div class="col-3">
+                                                <p class="fst-italic fq-bold mb-0">
+                                                    Price: ${{ $product->price }}
+                                                </p>
                                             </div>
+                                        </div>
+
+                                        <div class="row mt-3">
                                             <div class="col">
-                                                <p>Stock: {{ $product->stock }}</p>
+                                                <p class="h4 text-primary">Total Amount: $<span id="total_amount_{{ $product->id }}"></span></p>
                                             </div>
                                         </div>
 
@@ -148,21 +147,23 @@
                                             @method('PATCH')
 
                                             <label for="qty" class="form-label">Qty</label>
-                                            <div class="input-group mb-3">
-                                                <input type="number" name="qty" id="qty" class="form-control" value="{{ old('qty') }}" min="1" max="{{ $product->stock }}" required>
+                                            <div class="input-group">
+                                                <input type="number" name="qty" id="qty_{{ $product->id }}" class="form-control" value="{{ old('qty') }}" min="1" max="{{ $product->stock }}" aria-describedby="info-stock" required>
                                             </div>
-                                            @error('qty')
+                                            <div class="text-muted mb-3" id="info-stock">Stock: {{ $product->stock }}</div>
+                                            @error('qty_{{ $product->id }}')
                                                 <p class="text-danger small">{{ $message }}</p>
                                             @enderror
 
                                             <label for="total" class="form-label">Total</label>
                                             <div class="input-group mb-3">
-                                                <input type="number" name="total" id="total" class="form-control" value="{{ old('total') }}" min="1" required>
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" name="total" id="total_{{ $product->id }}" class="form-control" value="{{ old('total') }}" min="1" required>
                                             </div>
 
                                             <div class="text-end">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-primary">PAY</button>
+                                                <button type="submit" class="btn btn-primary" id="payButton_{{ $product->id }}">PAY</button>
                                             </div>
                                         </form>
                                     </div>
@@ -178,30 +179,48 @@
             @endforelse
         </tbody>
     </table>
-    
-    <div id="img_show"></div>
-    
+        
     @isset($product)
         <script>
             $(document).ready(function () {
-                function calculateTotal() {
-                    var qty = $('#qty').val();
-                    var pricePerUnit = parseFloat('{{ $product->price }}'); // Replace 'price' with the actual attribute name of the product price
-        
+                function calculateTotal(productId, pricePerUnit, walletAmount) {
+                    var qty = $('#qty_' + productId).val();
+
                     // Perform the calculation
                     var total = qty * pricePerUnit;
-        
+
                     // Update the total field
-                    $('#total').val(total.toFixed(2)); 
+                    $('#total_amount_' + productId).text(total.toFixed(2));
+
+                    // Get the input amount
+                    var inputAmount = parseFloat($('#total_' + productId).val()) || 0;
+
+                   // Check if walletAmount is not null or undefined
+                    if (walletAmount !== null && walletAmount !== undefined) {
+                        // Disable the 'PAY' button if the total is greater than the input amount or wallet amount is insufficient
+                        if (total > inputAmount || walletAmount < total) {
+                            $('#payButton_' + productId).prop('disabled', true);
+                        } else {
+                            $('#payButton_' + productId).prop('disabled', false);
+                        }
+                    } else {
+                        // Handle the case where walletAmount is null or undefined
+                        // You may choose to disable the 'PAY' button or handle it differently based on your requirements
+                        // For example: $('#payButton_' + productId).prop('disabled', true);
+                    }
                 }
-        
-                // Call the function on page load
-                calculateTotal();
-        
-                // Bind the function to the 'input' event of the quantity field
-                $('#qty').on('input', function () {
-                    calculateTotal();
-                });
+
+                // Call the function on page load for each product modal
+                @foreach($all_products as $product)
+                    calculateTotal({{ $product->id }}, {{ $product->price }}, {{ Auth::user()->wallet->amount ?? 'null' }});
+                @endforeach
+
+                // Bind the function to the 'input' event of the quantity and total fields for each product modal
+                @foreach($all_products as $product)
+                    $('#qty_{{ $product->id }}, #total_{{ $product->id }}').on('input', function () {
+                        calculateTotal({{ $product->id }}, {{ $product->price }}, {{ Auth::user()->wallet->amount ?? 'null' }});
+                    });
+                @endforeach
             });
         </script>
     @endisset    

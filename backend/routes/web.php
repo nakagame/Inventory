@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\WalletController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,5 +48,10 @@ Route::group(['middleware' => 'auth'], function() {
         Route::delete('/{id}/destroy', [AdminController::class, 'destroy'])->name('destroy');
         Route::delete('/{id}/active/force-delete', [AdminController::class, 'forceDeleteActive'])->name('forceDeleteActive');
         Route::delete('/{id}/inactive/force-delete', [AdminController::class, 'forceDeleteInactive'])->name('forceDeleteInactive');
+    });
+
+    // wallet
+    Route::group(['prefix' => 'wallet', 'as' => 'wallet.'], function() {
+        Route::post('/store', [WalletController::class, 'store'])->name('store');
     });
 });

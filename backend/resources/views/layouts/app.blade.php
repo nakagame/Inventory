@@ -1,3 +1,6 @@
+<?php
+    session_start();
+?>
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -42,6 +45,12 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('index') }}">{{ __('Products') }}</a>
                         </li>
+                        <li class="nav-item">
+                            {{-- <a class="nav-link" href="">{{ __('Wallet') }}</a> --}}
+                            <button type="button" class="nav-link btn btn-white" data-bs-toggle="modal" data-bs-target="#wallet">
+                                {{ __('Wallet') }}
+                            </button>
+                        </li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -61,9 +70,6 @@
                             @endif
                         @else
                             <li class="nav-item dropdown">
-                                {{-- <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
-                                </a> --}}
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     @if(Auth::user()->image)
                                         <img src="{{ asset('storage/profiles/'. Auth::user()->image) }}" alt="{{ Auth::user()->name }}" class="rounded circle" style="width: 40px; height: 40px;">                                
@@ -112,6 +118,44 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Modal Wallet -->
+    <div class="modal fade" id="wallet" tabindex="-1" aria-labelledby="walletLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title h-3 fw-bold" id="walletLabel">Tou-up</h1>
+                </div>
+                
+                <form action="{{ route('wallet.store') }}" method="post">
+                    @csrf
+
+                    <div class="modal-body">
+                        @isset(Auth::user()->wallet->amount)
+                            <p class="h5">Wallet: $ <span>{{ Auth::user()->wallet->amount }}</span></p>
+                        @endisset ()
+                        
+                        <input type="radio" name="wallet" class="btn-check" id="btn-check" autocomplete="off" value="100">
+                        <label class="btn btn-outline-warning" for="btn-check">$100</label>
+
+                        <input type="radio" name="wallet" class="btn-check" id="btn-check-300" autocomplete="off" value="300">
+                        <label class="btn btn-outline-warning" for="btn-check-300">$300</label>
+
+                        <input type="radio" name="wallet" class="btn-check" id="btn-check-500" autocomplete="off" value="500">
+                        <label class="btn btn-outline-warning" for="btn-check-500">$500</label>
+
+                        <input type="radio" name="wallet" class="btn-check" id="btn-check-1000" autocomplete="off" value="1000">
+                        <label class="btn btn-outline-warning" for="btn-check-1000">$1,000</label>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add to Wallet</button>
+                </div>
+                </form>
+            </div>
+        </div>
     </div>
 </body>
 </html>

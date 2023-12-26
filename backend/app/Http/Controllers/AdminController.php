@@ -16,8 +16,15 @@ class AdminController extends Controller
         $this->user  = $user;
     }
 
-    public function index() {
-        $all_users = $this->user->withTrashed()->paginate(15);
+    public function index(Request $request) {
+        $role = $request->input('role', '');
+        $query = $this->user->orderBy('deleted_at')->orderBy('role', 'desc')->withTrashed();
+
+        if($role) {
+            $query->where('role', $role);
+        }
+
+        $all_users = $query->paginate(15);
 
         return view('admin.index')->with('all_users', $all_users);
     }
@@ -45,9 +52,9 @@ class AdminController extends Controller
 
     public function searchUser() {
         if (request('search')) {
-            $users = $this->user->withTrashed()->where('name', 'like', '%' . request('search') . '%')->paginate(10);
+            $users = $this->user->orderBy('deleted_at')->orderBy('role', 'desc')->withTrashed()->where('name', 'like', '%' . request('search') . '%')->paginate(10);
         } else {
-            $users = $this->user->paginate(10);
+            $users = $this->user->orderBy('deleted_at')->orderBy('role', 'desc')->paginate(10);
         }
     
         return view('admin.search')->with('users', $users);
