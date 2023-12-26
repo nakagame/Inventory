@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Wallets;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,9 +12,11 @@ class ProductController extends Controller
 {   
     const LOCAL_FOLDER_PATH = 'public/images/';
     private $product;
+    private $wallet;
 
-    public function __construct(Product $product) {
+    public function __construct(Product $product, Wallets $wallet) {
         $this->product = $product;
+        $this->wallet  = $wallet;
     }
 
     public function index() {
@@ -94,13 +97,23 @@ class ProductController extends Controller
 
     public function updateStock(Request $request, $id) {
         $product = $this->product->findOrFail($id);
-        
+        $wallet = $this->wallet->where('user_id', Auth::user()->id)->first();
+
+        if (!$wallet) {
+            // Handle the case where no wallet is found for the user
+            return redirect()->back()->with('error', 'Wallet not found for the user.');
+        }
+    
         $request->validate([
-            'qty' => 'required|min:1' 
+            'qty'   => 'required|min:1',
+            'total' => 'required|min:1' 
         ]);
 
-        $new_stock = $product->stock - $request->qty;
+        // wallet 
+        $wallet->amount -= $request->total;
+        $wallet->save();
 
+        $new_stock = $product->stock - $request->qty;
         // Stock is gone -> delete the item
         if($new_stock <= 0) {
             $product->delete();

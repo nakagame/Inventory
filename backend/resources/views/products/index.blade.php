@@ -2,7 +2,7 @@
 
 @section('title', 'Product')
     
-@section('content')    
+@section('content')
     @if (Auth::user()->role !== 1)
         <div class="card">
             <div class="card-header">
@@ -134,7 +134,6 @@
                                                     Price: ${{ $product->price }}
                                                 </p>
                                             </div>
-
                                         </div>
 
                                         <div class="row mt-3">
@@ -184,7 +183,7 @@
     @isset($product)
         <script>
             $(document).ready(function () {
-                function calculateTotal(productId, pricePerUnit) {
+                function calculateTotal(productId, pricePerUnit, walletAmount) {
                     var qty = $('#qty_' + productId).val();
 
                     // Perform the calculation
@@ -196,23 +195,30 @@
                     // Get the input amount
                     var inputAmount = parseFloat($('#total_' + productId).val()) || 0;
 
-                    // Disable the 'PAY' button if the total is greater than the input amount
-                    if (total > inputAmount) {
-                        $('#payButton_' + productId).prop('disabled', true);
+                   // Check if walletAmount is not null or undefined
+                    if (walletAmount !== null && walletAmount !== undefined) {
+                        // Disable the 'PAY' button if the total is greater than the input amount or wallet amount is insufficient
+                        if (total > inputAmount || walletAmount < total) {
+                            $('#payButton_' + productId).prop('disabled', true);
+                        } else {
+                            $('#payButton_' + productId).prop('disabled', false);
+                        }
                     } else {
-                        $('#payButton_' + productId).prop('disabled', false);
+                        // Handle the case where walletAmount is null or undefined
+                        // You may choose to disable the 'PAY' button or handle it differently based on your requirements
+                        // For example: $('#payButton_' + productId).prop('disabled', true);
                     }
                 }
 
                 // Call the function on page load for each product modal
                 @foreach($all_products as $product)
-                    calculateTotal({{ $product->id }}, {{ $product->price }});
+                    calculateTotal({{ $product->id }}, {{ $product->price }}, {{ Auth::user()->wallet->amount ?? 'null' }});
                 @endforeach
 
                 // Bind the function to the 'input' event of the quantity and total fields for each product modal
                 @foreach($all_products as $product)
                     $('#qty_{{ $product->id }}, #total_{{ $product->id }}').on('input', function () {
-                        calculateTotal({{ $product->id }}, {{ $product->price }});
+                        calculateTotal({{ $product->id }}, {{ $product->price }}, {{ Auth::user()->wallet->amount ?? 'null' }});
                     });
                 @endforeach
             });
